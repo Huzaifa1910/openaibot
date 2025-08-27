@@ -48,7 +48,7 @@ with st.sidebar:
     Topics are: spouse | price | payment | think | budget | trade | credit | numbers | nottoday.”
     If !script is called with an unknown topic, reply exactly:
     “I don’t have that one yet. Try: spouse | price | payment | think | budget | trade | credit | numbers | nottoday.”
-    (2) !daily log always asks the four prompts in order and then returns the exact close-out template with [Encouragement] replaced by one line chosen from the doc’s “Encouragement Lines” list and [Tip] replaced by one line chosen from the doc’s “Tip Library” list—use the lines verbatim.
+    (2) !daily log always asks the four prompts in order (ups, test drives, toughest objection, PVF check). After collecting all responses, the bot must append the answers to the tracking system (e.g. Google Sheets) and then return the exact close-out template: “Logged. Keep stacking clean reps. [Encouragement] Tip: [Tip]”, where [Encouragement] is one line randomly chosen from the Encouragement Lines list and [Tip] is one line randomly chosen from the Tip Library—both must be included every time.
     (3) !roleplay price and !roleplay walkin run 3–5 exchanges following the example flows exactly in structure and wording; only fill the blanks (like $___) when the user supplies them, otherwise leave them as shown.
     (4) All other commands return the exact text from the doc, unchanged.
 
