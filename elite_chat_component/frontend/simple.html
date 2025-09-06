@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Elite Auto Sales Academy - Chat</title>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <style type="text/tailwindcss">
+    :root {
+      --elite-blue: #0D3B66;
+      --elite-gold: #FFD700;
+      --elite-white: #FFFFFF;
+      --elite-text: #1F2A37;
+      --elite-muted: #6B7280;
+      --elite-border: #E6E8EB;
+    }
+    body { font-family: 'Montserrat', 'Open Sans', system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    .sidebar {
+      background: var(--elite-white);
+      border-right: 1px solid var(--elite-border);
+      width: 310px;
+    }
+    .sidebar-btn {
+      width: 100%;
+      text-align: left;
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.375rem;
+      font-weight: 600;
+      transition: background 0.2s, color 0.2s;
+      background: var(--elite-white);
+      color: var(--elite-blue);
+      border: 1.5px solid var(--elite-blue);
+      cursor: pointer;
+    }
+    .sidebar-btn:hover {
+      background: var(--elite-blue);
+      color: var(--elite-white);
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 0.375rem;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: color-mix(in srgb, var(--elite-gold) 25%, white);
+      color: #6b5d00;
+      border: 1px solid color-mix(in srgb, var(--elite-gold) 60%, white);
+    }
+    .chat-card {
+      border-radius: 0.75rem;
+      border: 1px solid var(--elite-border);
+      background: var(--elite-white);
+      box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+    }
+    .chat-assistant { border-left: 4px solid var(--elite-blue); }
+    .chat-user { border-left: 4px solid var(--elite-gold); }
+    .input {
+      width: 100%;
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--elite-border);
+      background: var(--elite-white);
+      color: var(--elite-text);
+    }
+    .input:focus {
+      outline: none;
+      border-color: var(--elite-blue);
+    }
+    .send-btn {
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+      font-weight: 600;
+      transition: background 0.2s, color 0.2s;
+      background: var(--elite-blue);
+      color: var(--elite-white);
+      border: 2px solid var(--elite-blue);
+      cursor: pointer;
+    }
+    .send-btn:hover {
+      background: var(--elite-white);
+      color: var(--elite-blue);
+    }
+    .send-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+    .modal.hidden { display: none; }
+    .modal-content { background: var(--elite-white); border-radius: 1rem; padding: 2rem; width: 90%; max-width: 400px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 2px solid var(--elite-blue); }
+    .modal-input { width: 100%; padding: 0.75rem 1rem; border: 1.5px solid var(--elite-border); border-radius: 0.5rem; background: var(--elite-white); color: var(--elite-text); font-family: inherit; }
+    .modal-input:focus { outline: none; border-color: var(--elite-blue); }
+    .modal-btn { padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 600; transition: all 0.2s; cursor: pointer; border: 2px solid var(--elite-blue); }
+    .modal-btn-primary { background: var(--elite-blue); color: var(--elite-white); }
+    .modal-btn-primary:hover { background: var(--elite-white); color: var(--elite-blue); }
+    .modal-btn-secondary { background: var(--elite-white); color: var(--elite-blue); }
+    .modal-btn-secondary:hover { background: var(--elite-blue); color: var(--elite-white); }
+    .chat-disabled { pointer-events: none; opacity: 0.5; }
+  </style>
+</head>
+<body class="bg-[var(--elite-white)] text-[var(--elite-text)]">
+<div class="flex h-screen bg-[var(--elite-white)]">
+  <!-- Header -->
+  <header class="border-b-2 border-[var(--elite-blue)] bg-[var(--elite-white)]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="h-16 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <button id="sidebarToggle" class="rounded-md border px-3 py-1.5 text-sm font-semibold"
+                  style="border-color: var(--elite-border); color: var(--elite-blue);">
+            ☰ Menu
+          </button>
+          <div>
+            <h2 class="text-lg sm:text-xl font-extrabold text-[var(--elite-blue)] leading-none">Sales Coach AI</h2>
+            <p class="text-xs text-[var(--elite-muted)]">Elite Auto Sales Academy Bot <span class="chip">powered by AG Goldsmith</span></p>
+          </div>
+        </div>
+        <div class="h-10 w-16 rounded-md border border-[var(--elite-border)] p-1.5 shadow-sm bg-[var(--elite-blue)] flex items-center justify-center">
+          <span class="text-[var(--elite-gold)] font-bold text-xs">ELITE</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar hidden md:block">
+    <div class="h-full flex flex-col">
+      <div class="p-4">
+        <h3 class="text-sm font-semibold text-[var(--elite-text)] mb-3">Message Mastery</h3>
+        <div class="space-y-2">
+          <button class="sidebar-btn" data-cmd="!scripts">Scripts & Templates</button>
+          <button class="sidebar-btn" data-cmd="!trust">Trust Building</button>
+          <button class="sidebar-btn" data-cmd="!tonality">Voice & Tonality</button>
+          <button class="sidebar-btn" data-cmd="!firstimpression">First Impressions</button>
+        </div>
+      </div>
+
+      <div class="p-4">
+        <h3 class="text-sm font-semibold text-[var(--elite-text)] mb-3">Closer Moves</h3>
+        <div class="space-y-2">
+          <button class="sidebar-btn" data-cmd="!pvf">Pain-Vision-Fit Close</button>
+          <button class="sidebar-btn" data-cmd="!checkpoints">Emotional Checkpoints</button>
+        </div>
+      </div>
+
+      <div class="p-4">
+        <h3 class="text-sm font-semibold text-[var(--elite-text)] mb-3">Objection Handling</h3>
+        <div class="space-y-2">
+          <button class="sidebar-btn" data-cmd="!objection price">Price Objections</button>
+          <button class="sidebar-btn" data-cmd="!objection paymenttoohigh">Payment Too High</button>
+          <button class="sidebar-btn" data-cmd="!objection tradevalue">Trade Value</button>
+          <button class="sidebar-btn" data-cmd="!objection thinkaboutit">Think About It</button>
+          <button class="sidebar-btn" data-cmd="!objection shoparound">Shop Around</button>
+          <button class="sidebar-btn" data-cmd="!objection spouse">Spouse Decision</button>
+        </div>
+      </div>
+
+      <div class="p-4">
+        <h3 class="text-sm font-semibold text-[var(--elite-text)] mb-3">Role-Play Scenarios</h3>
+        <div class="space-y-2">
+          <button class="sidebar-btn" data-cmd="!roleplay price">Price Role-Play</button>
+          <button class="sidebar-btn" data-cmd="!roleplay trade">Trade Role-Play</button>
+        </div>
+      </div>
+
+      <div class="p-4">
+        <h3 class="text-sm font-semibold text-[var(--elite-text)] mb-3">Money Momentum</h3>
+        <div class="space-y-2">
+          <button class="sidebar-btn" data-cmd="!dailylog">Daily Activity Log</button>
+          <button class="sidebar-btn" data-cmd="!earn">E.A.R.N. System</button>
+        </div>
+      </div>
+
+      <div class="p-4 mt-auto">
+        <h3 class="text-sm font-semibold text-[var(--elite-text)] mb-3">Quick Actions</h3>
+        <div class="flex gap-2">
+          <button class="sidebar-btn text-xs px-2 py-1" data-cmd="continue">Continue</button>
+          <button class="sidebar-btn text-xs px-2 py-1" data-cmd="restart">Restart</button>
+          <button class="sidebar-btn text-xs px-2 py-1" data-cmd="end">End</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Chat Area -->
+  <main class="flex-1 flex flex-col min-w-0">
+    <div id="messages" class="flex-1 p-5 space-y-5 overflow-y-auto">
+      <!-- Messages will be populated by JavaScript -->
+    </div>
+
+    <!-- Composer -->
+    <div class="border-t border-[var(--elite-border)] p-4">
+      <form id="composer" class="flex items-center gap-3">
+        <input id="prompt" class="input flex-1" type="text" placeholder="Type a command or message…" />
+        <button type="submit" class="send-btn" id="sendBtn">Send</button>
+      </form>
+    </div>
+  </main>
+</div>
+
+<!-- Name Modal -->
+<div id="nameModal" class="modal">
+  <div class="modal-content">
+    <h3 style="font-size: 1.5rem; font-weight: bold; color: var(--elite-blue); text-align: center; margin-bottom: 0.5rem;">
+      Welcome to Training!
+    </h3>
+    <p style="color: var(--elite-muted); text-align: center; margin-bottom: 1.5rem; font-size: 0.9rem;">
+      Please enter your name to begin your personalized sales training experience.
+    </p>
+    
+    <form id="nameForm" style="margin-bottom: 1.5rem;">
+      <div style="margin-bottom: 1rem;">
+        <label for="userName" style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: var(--elite-text);">
+          Your Name
+        </label>
+        <input 
+          type="text" 
+          id="userName" 
+          placeholder="Enter your full name" 
+          class="modal-input"
+          required
+          autocomplete="name"
+        />
+      </div>
+      
+      <div style="display: flex; gap: 0.75rem;">
+        <button type="button" id="skipBtn" class="modal-btn modal-btn-secondary" style="flex: 1;">
+          Skip
+        </button>
+        <button type="submit" class="modal-btn modal-btn-primary" style="flex: 2;">
+          Start Training
+        </button>
+      </div>
+    </form>
+    
+    <p style="text-align: center; font-size: 0.75rem; color: var(--elite-muted);">
+      Your name helps us personalize your training experience.
+    </p>
+  </div>
+</div>
+
+<script src="https://unpkg.com/streamlit-component-lib@1.4.0/dist/streamlit.js"></script>
+<script>
+let userName = 'User';
+let messages = [
+  { role: 'assistant', content: 'Welcome to Elite Auto Sales Academy. Use the commands from the sidebar (e.g., !scripts) or type your message below.' }
+];
+let isLoading = false;
+let sidebarOpen = false;
+
+// Wait for Streamlit to be available
+function initializeStreamlit() {
+  if (window.Streamlit) {
+    window.Streamlit.setComponentReady();
+    window.Streamlit.setFrameHeight(800);
+    
+    // Listen for data from Streamlit
+    window.Streamlit.events.addEventListener(window.Streamlit.RENDER_EVENT, function(event) {
+      const data = event.detail;
+      handleStreamlitData(data);
+    });
+    
+    renderMessages();
+  } else {
+    setTimeout(initializeStreamlit, 100);
+  }
+}
+
+function handleStreamlitData(args) {
+  if (args.messages && Array.isArray(args.messages)) {
+    messages = args.messages;
+    isLoading = false;
+    renderMessages();
+    updateUI();
+  }
+  
+  if (args.user_name) {
+    userName = args.user_name;
+  }
+}
+
+function renderMessages() {
+  const messagesContainer = document.getElementById('messages');
+  messagesContainer.innerHTML = '';
+  
+  messages.forEach(msg => {
+    const div = document.createElement('div');
+    div.className = `chat-card p-4 max-w-2xl ${msg.role === 'assistant' ? 'chat-assistant' : 'chat-user'} ${msg.role === 'user' ? 'ml-auto' : ''}`;
+    div.innerHTML = `<p class="text-sm leading-relaxed whitespace-pre-wrap">${msg.content}</p>`;
+    messagesContainer.appendChild(div);
+  });
+  
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function updateUI() {
+  const sendBtn = document.getElementById('sendBtn');
+  const promptInput = document.getElementById('prompt');
+  
+  sendBtn.disabled = isLoading;
+  promptInput.disabled = isLoading;
+  sendBtn.textContent = isLoading ? '...' : 'Send';
+}
+
+function sendMessage(message) {
+  if (!message.trim() || isLoading) return;
+  
+  // Add user message to the chat
+  messages.push({ role: 'user', content: message });
+  renderMessages();
+  
+  isLoading = true;
+  updateUI();
+  
+  if (window.Streamlit) {
+    window.Streamlit.setComponentValue({
+      action: 'send_message',
+      message: message,
+      user_name: userName
+    });
+  }
+}
+
+function sendCommand(command) {
+  // Add command as user message
+  messages.push({ role: 'user', content: command });
+  renderMessages();
+  
+  isLoading = true;
+  updateUI();
+  
+  if (window.Streamlit) {
+    window.Streamlit.setComponentValue({
+      action: 'send_command',
+      command: command,
+      user_name: userName
+    });
+  }
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', () => {
+  // Initialize Streamlit
+  initializeStreamlit();
+  
+  // Sidebar toggle
+  document.getElementById('sidebarToggle').addEventListener('click', () => {
+    sidebarOpen = !sidebarOpen;
+    const sidebar = document.getElementById('sidebar');
+    if (sidebarOpen) {
+      sidebar.classList.remove('hidden');
+    } else {
+      sidebar.classList.add('hidden');
+    }
+  });
+  
+  // Message form
+  document.getElementById('composer').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const input = document.getElementById('prompt');
+    const message = input.value.trim();
+    if (message) {
+      input.value = '';
+      sendMessage(message);
+    }
+  });
+  
+  // Sidebar commands
+  document.querySelectorAll('.sidebar-btn[data-cmd]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const command = btn.getAttribute('data-cmd');
+      sendCommand(command);
+    });
+  });
+  
+  // Name modal
+  const nameModal = document.getElementById('nameModal');
+  const nameForm = document.getElementById('nameForm');
+  const skipBtn = document.getElementById('skipBtn');
+  
+  nameForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const nameInput = document.getElementById('userName');
+    if (nameInput.value.trim()) {
+      userName = nameInput.value.trim();
+      nameModal.classList.add('hidden');
+    }
+  });
+  
+  skipBtn.addEventListener('click', () => {
+    userName = 'User';
+    nameModal.classList.add('hidden');
+  });
+});
+</script>
+</body>
+</html>
