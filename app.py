@@ -117,23 +117,50 @@ TONE GUARD
 # =========================
 # Google Sheets config
 # =========================
-DAILY_LOG_SPREADSHEET_ID = os.getenv("DAILY_LOG_SPREADSHEET_ID", "")
-SESSION_LOG_SPREADSHEET_ID = os.getenv("SESSION_LOG_SPREADSHEET_ID", "")
+# Try to get spreadsheet IDs from Streamlit secrets first, fallback to environment variables
+DAILY_LOG_SPREADSHEET_ID = ""
+SESSION_LOG_SPREADSHEET_ID = ""
+
+# Check Streamlit secrets first
+try:
+    if hasattr(st, 'secrets'):
+        DAILY_LOG_SPREADSHEET_ID = st.secrets.get("DAILY_LOG_SPREADSHEET_ID", "")
+        SESSION_LOG_SPREADSHEET_ID = st.secrets.get("SESSION_LOG_SPREADSHEET_ID", "")
+except Exception:
+    pass
+
+# Fall back to environment variables
+if not DAILY_LOG_SPREADSHEET_ID:
+    DAILY_LOG_SPREADSHEET_ID = os.getenv("DAILY_LOG_SPREADSHEET_ID", "")
+if not SESSION_LOG_SPREADSHEET_ID:
+    SESSION_LOG_SPREADSHEET_ID = os.getenv("SESSION_LOG_SPREADSHEET_ID", "")
+
 print(f"Daily log sheet: {DAILY_LOG_SPREADSHEET_ID}, Session log sheet: {SESSION_LOG_SPREADSHEET_ID}")
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive",
     "https://www.googleapis.com/auth/drive.file"
 ]
-# Get the service account JSON from environment variable
-SERVICE_ACCOUNT_JSON = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
-if SERVICE_ACCOUNT_JSON and not SERVICE_ACCOUNT_JSON.startswith("{"):
-    # If it's not already a JSON string but a file path
-    try:
-        with open(SERVICE_ACCOUNT_JSON, 'r') as f:
-            SERVICE_ACCOUNT_JSON = f.read()
-    except Exception as e:
-        print(f"Warning: Could not read service account file at {SERVICE_ACCOUNT_JSON}: {e}")
+# Try to get the service account JSON from multiple sources
+# 1. First check for Streamlit secrets (preferred for deployed apps)
+SERVICE_ACCOUNT_JSON = None
+try:
+    if hasattr(st, 'secrets') and 'gcp_service_account' in st.secrets:
+        print("Using service account from Streamlit secrets")
+        SERVICE_ACCOUNT_JSON = json.dumps(dict(st.secrets["gcp_service_account"]))
+except Exception as e:
+    print(f"Warning: Could not load service account from Streamlit secrets: {e}")
+
+# 2. Fall back to environment variable if no secrets
+if not SERVICE_ACCOUNT_JSON:
+    SERVICE_ACCOUNT_JSON = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
+    if SERVICE_ACCOUNT_JSON and not SERVICE_ACCOUNT_JSON.startswith("{"):
+        # If it's not already a JSON string but a file path
+        try:
+            with open(SERVICE_ACCOUNT_JSON, 'r') as f:
+                SERVICE_ACCOUNT_JSON = f.read()
+        except Exception as e:
+            print(f"Warning: Could not read service account file at {SERVICE_ACCOUNT_JSON}: {e}")
 
 def get_sheets_service():
     """Create and return a Google Sheets API service."""

@@ -41,8 +41,8 @@ yarn-error.log
 *.swo
 .DS_Store
 
-# Streamlit
-.streamlit/
+# Streamlit secrets (but keep .streamlit directory)
+.streamlit/secrets.toml
 
 # Production
 .vercel
