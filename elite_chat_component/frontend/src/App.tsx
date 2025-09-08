@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Streamlit, RenderData } from "streamlit-component-lib";
+import ReactMarkdown from 'react-markdown';
 import './ChatApp.css';
 
 interface Message {
@@ -18,12 +19,12 @@ const isStreamlit = window.parent !== window;
 
 const App: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Welcome to Elite Auto Sales Academy. Use the commands from the sidebar (e.g., !scripts) or type your message below.' }
+    { role: 'assistant', content: 'Welcome to Elite Auto Sales Academy. Use the commands from the sidebar (e.g., Scripts & Templates) or type your message below.' }
   ]);
   const [prompt, setPrompt] = useState('');
   const [userName, setUserName] = useState('User');
   const [isLoading, setIsLoading] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true); // Set to true to show sidebar by default
   const [showModal, setShowModal] = useState(true); // Show modal by default for both standalone and Streamlit
   const [args, setArgs] = useState<Args>({});
   
@@ -182,12 +183,27 @@ const App: React.FC = () => {
     }
   };
 
+  // Force consistent colors regardless of theme
+  const forceConsistentStyle = {
+    color: 'var(--elite-text)',
+    backgroundColor: 'var(--elite-white)',
+    colorScheme: 'light' // Ensure select elements also use light theme
+  };
+
   return (
-    <div className="chat-container">
+    <div className="chat-container" style={forceConsistentStyle}>
       {/* Header */}
       <header className="chat-header">
         <div className="header-content">
           <div className="header-left">
+            {/* Sidebar toggle button */}
+            <button 
+              className="sidebar-toggle" 
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              {sidebarOpen ? '◀ Hide Menu' : '▶ Show Menu'}
+            </button>
+            
             {/* Logo 1 - Client signature (AG_T_logo.png) */}
             <img 
               src="AG_T_logo.png" 
@@ -197,7 +213,7 @@ const App: React.FC = () => {
             />
             <div className="brand">
               <h2>Sales Coach AI</h2>
-              <p>Elite Auto Sales Academy Bot <span className="chip">powered by AG Goldsmith</span></p>
+              <p>Elite Auto Sales Academy Bot <span className="elite-chip">powered by AG Goldsmith</span></p>
             </div>
           </div>
           {/* Logo 2 - Product logo (logo_1.png) */}
@@ -214,42 +230,84 @@ const App: React.FC = () => {
         {/* Sidebar */}
         <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
           <div className="sidebar-content">
+            <div className="sidebar-header">
+              <h2>AG Bot • Controls</h2>
+            </div>
+
+            {/* Message Mastery */}
             <div className="sidebar-section">
               <h3>Message Mastery</h3>
-              <button className="sidebar-btn" onClick={() => sendCommand('!scripts')}>Scripts & Templates</button>
-              <button className="sidebar-btn" onClick={() => sendCommand('!trust')}>Trust Building</button>
-              <button className="sidebar-btn" onClick={() => sendCommand('!tonality')}>Voice & Tonality</button>
-              <button className="sidebar-btn" onClick={() => sendCommand('!firstimpression')}>First Impressions</button>
+              <button className="sidebar-btn" onClick={() => sendCommand('!scripts')}>!scripts</button>
+              <button className="sidebar-btn" onClick={() => sendCommand('!trust')}>!trust</button>
+              <button className="sidebar-btn" onClick={() => sendCommand('!tonality')}>!tonality</button>
+              <button className="sidebar-btn" onClick={() => sendCommand('!firstimpression')}>!firstimpression</button>
             </div>
-
+            
+            <div className="sidebar-divider"></div>
+            
+            {/* Closer Moves */}
             <div className="sidebar-section">
               <h3>Closer Moves</h3>
-              <button className="sidebar-btn" onClick={() => sendCommand('!pvf')}>Pain-Vision-Fit Close</button>
-              <button className="sidebar-btn" onClick={() => sendCommand('!checkpoints')}>Emotional Checkpoints</button>
+              <button className="sidebar-btn" onClick={() => sendCommand('!pvf')}>!pvf</button>
             </div>
 
+            <div className="sidebar-divider"></div>
+
+            {/* Objection Handling */}
             <div className="sidebar-section">
               <h3>Objection Handling</h3>
-              <button className="sidebar-btn" onClick={() => sendCommand('!objection price')}>Price Objections</button>
-              <button className="sidebar-btn" onClick={() => sendCommand('!objection paymenttoohigh')}>Payment Too High</button>
-              <button className="sidebar-btn" onClick={() => sendCommand('!objection tradevalue')}>Trade Value</button>
-              <button className="sidebar-btn" onClick={() => sendCommand('!objection thinkaboutit')}>Think About It</button>
-              <button className="sidebar-btn" onClick={() => sendCommand('!objection shoparound')}>Shop Around</button>
-              <button className="sidebar-btn" onClick={() => sendCommand('!objection spouse')}>Spouse Decision</button>
+              <button className="sidebar-btn" onClick={() => sendCommand('!objection price')}>!objection price</button>
+              <button className="sidebar-btn" onClick={() => sendCommand('!objection paymenttoohigh')}>!objection paymenttoohigh</button>
+              <button className="sidebar-btn" onClick={() => sendCommand('!objection tradevalue')}>!objection tradevalue</button>
+              <button className="sidebar-btn" onClick={() => sendCommand('!objection thinkaboutit')}>!objection thinkaboutit</button>
+              <button className="sidebar-btn" onClick={() => sendCommand('!objection shoparound')}>!objection shoparound</button>
+              <button className="sidebar-btn" onClick={() => sendCommand('!objection spouse')}>!objection spouse</button>
+              <button className="sidebar-btn" onClick={() => sendCommand('!objection paymentvsprice')}>!objection paymentvsprice</button>
+              <button className="sidebar-btn" onClick={() => sendCommand('!objection timingstall')}>!objection timingstall</button>
             </div>
-
+            
+            <div className="sidebar-divider"></div>
+            
+            {/* Roleplay Scenarios */}
             <div className="sidebar-section">
               <h3>Role-Play Scenarios</h3>
-              <button className="sidebar-btn" onClick={() => sendCommand('!roleplay price')}>Price Role-Play</button>
-              <button className="sidebar-btn" onClick={() => sendCommand('!roleplay trade')}>Trade Role-Play</button>
+              <button className="sidebar-btn" onClick={() => sendCommand('!roleplay price')}>!roleplay price</button>
+              <button className="sidebar-btn" onClick={() => sendCommand('!roleplay trade')}>!roleplay trade</button>
+              <button className="sidebar-btn" onClick={() => sendCommand('!roleplay think')}>!roleplay think</button>
+              <button className="sidebar-btn" onClick={() => sendCommand('!roleplay shop')}>!roleplay shop</button>
+              <button className="sidebar-btn" onClick={() => sendCommand('!roleplay spouse')}>!roleplay spouse</button>
             </div>
-
+            
+            <div className="sidebar-divider"></div>
+            
+            {/* Money Momentum */}
             <div className="sidebar-section">
               <h3>Money Momentum</h3>
-              <button className="sidebar-btn" onClick={() => sendCommand('!dailylog')}>Daily Activity Log</button>
-              <button className="sidebar-btn" onClick={() => sendCommand('!earn')}>E.A.R.N. System</button>
+              <button className="sidebar-btn" onClick={() => sendCommand('!dailylog')}>!dailylog</button>
+              <button className="sidebar-btn" onClick={() => sendCommand('!earn')}>!earn</button>
             </div>
-
+            
+            <div className="sidebar-divider"></div>
+            
+            {/* Five Emotional Checkpoints */}
+            <div className="sidebar-section">
+              <h3>Five Emotional Checkpoints</h3>
+              <button className="sidebar-btn" onClick={() => sendCommand('!checkpoints')}>!checkpoints</button>
+            </div>
+            
+            <div className="sidebar-divider"></div>
+            
+            {/* Coaching Resources */}
+            <div className="sidebar-section">
+              <h3>Coaching Resources</h3>
+              <button className="sidebar-btn" onClick={() => sendCommand('!coaching')}>!coaching</button>
+              <button className="sidebar-btn" onClick={() => sendCommand('!coaching tips')}>!coaching tips</button>
+              <button className="sidebar-btn" onClick={() => sendCommand('!coaching roleplay')}>!coaching roleplay</button>
+            </div>
+            
+            <div className="sidebar-divider"></div>
+            
+            {/* Quick Actions */}
             <div className="sidebar-section">
               <h3>Quick Actions</h3>
               <div className="quick-actions">
@@ -260,13 +318,43 @@ const App: React.FC = () => {
             </div>
           </div>
         </aside>
+        
+        {/* Overlay for mobile - closes sidebar when clicked */}
+        <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)}></div>
 
         {/* Main Chat */}
         <main className="chat-main">
-          <div className="messages">
+          <div className="messages" style={forceConsistentStyle}>
             {messages.map((msg, index) => (
-              <div key={index} className={`message ${msg.role}`}>
-                <p>{msg.content}</p>
+              <div key={index} className={`message ${msg.role}`} style={{color: 'var(--elite-text)'}}>
+                {msg.content.startsWith("COACHING_TIP:") && (
+                  <div className="coaching-tip">
+                    <div className="coaching-tip-header">
+                      <span className="coaching-icon">💡</span>
+                      <h4>Coaching Tip</h4>
+                    </div>
+                    <p>{msg.content.match(/COACHING_TIP:([\s\S]+?)END_COACHING_TIP/)?.[1].trim() || ""}</p>
+                  </div>
+                )}
+                
+                {msg.content.includes("ROLE_PLAY_LEVEL:") && (
+                  <div className="role-play-level">
+                    Role-Play Depth: Level {msg.content.match(/ROLE_PLAY_LEVEL:(\d+)END_ROLE_PLAY_LEVEL/)?.[1] || "1"}
+                  </div>
+                )}
+                
+                {msg.role === 'assistant' ? (
+                  <div className="markdown-content" style={{color: 'var(--elite-text)'}}>
+                    <ReactMarkdown>
+                      {msg.content
+                        .replace(/COACHING_TIP:[\s\S]+?END_COACHING_TIP/, '')
+                        .replace(/ROLE_PLAY_LEVEL:\d+END_ROLE_PLAY_LEVEL/, '')
+                        .trim()}
+                    </ReactMarkdown>
+                  </div>
+                ) : (
+                  <p style={{color: 'var(--elite-text)'}}>{msg.content}</p>
+                )}
               </div>
             ))}
           </div>
@@ -290,9 +378,9 @@ const App: React.FC = () => {
       {/* Name Modal */}
       {showModal && (
         <div className="modal">
-          <div className="modal-content">
-            <h3>Welcome to Training!</h3>
-            <p>Please enter your name to begin your personalized sales training experience.</p>
+          <div className="modal-content" style={forceConsistentStyle}>
+            <h3 style={{color: 'var(--elite-blue)'}}>Welcome to Training!</h3>
+            <p style={{color: 'var(--elite-text)'}}>Please enter your name to begin your personalized sales training experience.</p>
             
             <form onSubmit={(e) => {
               e.preventDefault();
