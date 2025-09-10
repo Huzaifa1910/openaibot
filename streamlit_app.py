@@ -898,19 +898,19 @@ if not os.path.exists(COMPONENT_DIR):
 
 # Choose one: either path (for production) or url (for development)
 # For local development:
-chat_component = components.declare_component(
-    "elite_chat",
-    # path=COMPONENT_DIR,
-    url="http://localhost:3000"  # For local development
-)
+# chat_component = components.declare_component(
+#     "elite_chat",
+#     # path=COMPONENT_DIR,
+#     url="http://localhost:3000"  # For local development
+# )
 
 frontend_build_dir = Path(__file__).parent / "elite_chat_component" / "frontend" / "build"
 
 # For production (uncomment path and comment url):
-# chat_component = components.declare_component(
-#     "elite_chat",
-#     path=str(frontend_build_dir),
-# )
+chat_component = components.declare_component(
+    "elite_chat",
+    path=str(frontend_build_dir),
+)
 
 # Track processed events to avoid loops
 if "last_processed_event" not in st.session_state:
