@@ -40,7 +40,7 @@ yarn-error.log
 *.swp
 *.swo
 .DS_Store
-
+EASA_Bot_Command_Copy_Final.pdf
 # Streamlit secrets (but keep .streamlit directory)
 .streamlit/secrets.toml
 

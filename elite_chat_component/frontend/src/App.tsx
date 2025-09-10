@@ -262,8 +262,8 @@ const App: React.FC = () => {
               <button className="sidebar-btn" onClick={() => sendCommand('!objection thinkaboutit')}>!objection thinkaboutit</button>
               <button className="sidebar-btn" onClick={() => sendCommand('!objection shoparound')}>!objection shoparound</button>
               <button className="sidebar-btn" onClick={() => sendCommand('!objection spouse')}>!objection spouse</button>
-              <button className="sidebar-btn" onClick={() => sendCommand('!objection paymentvsprice')}>!objection paymentvsprice</button>
-              <button className="sidebar-btn" onClick={() => sendCommand('!objection timingstall')}>!objection timingstall</button>
+              {/* <button className="sidebar-btn" onClick={() => sendCommand('!objection paymentvsprice')}>!objection paymentvsprice</button>
+              <button className="sidebar-btn" onClick={() => sendCommand('!objection timingstall')}>!objection timingstall</button> */}
             </div>
             
             <div className="sidebar-divider"></div>
@@ -297,14 +297,22 @@ const App: React.FC = () => {
             
             <div className="sidebar-divider"></div>
             
+
             {/* Coaching Resources */}
             <div className="sidebar-section">
               <h3>Coaching Resources</h3>
-              <button className="sidebar-btn" onClick={() => sendCommand('!coaching')}>!coaching</button>
-              <button className="sidebar-btn" onClick={() => sendCommand('!coaching tips')}>!coaching tips</button>
-              <button className="sidebar-btn" onClick={() => sendCommand('!coaching roleplay')}>!coaching roleplay</button>
+              <button className="sidebar-btn" title="Show coaching menu" onClick={() => sendCommand('!coaching')}>!coaching</button>
+              <button className="sidebar-btn" title="Coaching tips (aliases: !coaching-tips, !coachingtips)" onClick={() => sendCommand('!coaching-tips')}>!coaching-tips</button>
+              <button className="sidebar-btn" title="Coaching roleplay (aliases: !coaching-roleplay, !coachingroleplay)" onClick={() => sendCommand('!coaching-roleplay')}>!coaching-roleplay</button>
             </div>
-            
+
+            <div className="sidebar-divider"></div>
+
+            {/* Help & Commands */}
+            <div className="sidebar-section">
+              <h3>Help & Commands</h3>
+              <button className="sidebar-btn" title="Show all commands and examples" onClick={() => sendCommand('!help')}>!help / !commands</button>
+            </div>
             <div className="sidebar-divider"></div>
             
             {/* Quick Actions */}
